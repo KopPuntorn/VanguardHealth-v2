@@ -1,0 +1,44 @@
+{
+    "patient_id": "P001",
+    "visit_date": "2024-01-12",
+    "chief_complaint": "Persistent fatigue and dizziness",
+    "vitals": {
+        "blood_pressure": "145/90 mmHg",
+        "heart_rate": 88,
+        "temperature": 37.2,
+        "respiratory_rate": 18,
+        "oxygen_saturation": 98
+    },
+    "diagnosis": [
+        {
+            "condition": "Hypertension Stage 2",
+            "icd_10": "I10",
+            "status": "Active"
+        },
+        {
+            "condition": "Iron Deficiency Anemia",
+            "icd_10": "D50.9",
+            "status": "New"
+        }
+    ],
+    "medications": [
+        {
+            "name": "Amlodipine",
+            "dosage": "5mg",
+            "frequency": "Once daily",
+            "purpose": "Blood pressure control"
+        },
+        {
+            "name": "Ferrous Sulfate",
+            "dosage": "325mg",
+            "frequency": "Twice daily",
+            "purpose": "Iron supplement"
+        }
+    ],
+    "lab_results": {
+        "hemoglobin": "10.5 g/dL",
+        "ferritin": "15 ng/mL",
+        "cholesterol_total": "210 mg/dL"
+    },
+    "clinical_notes": "Patient reports feeling tired even after full night sleep. Occasional dizziness upon standing. No chest pain. Advising lifestyle changes and medication adherence."
+}

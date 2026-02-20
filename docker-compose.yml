@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: vanguard-db
+    environment:
+      POSTGRES_USER: vanguard
+      POSTGRES_PASSWORD: vanguard_secret
+      POSTGRES_DB: vanguardhealth
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vanguard-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vanguard -d vanguardhealth" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant Vector Database for RAG
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: vanguard-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - vanguard-network
+
+  # Go Backend Service
+  backend:
+    build:
+      context: ./services/backend-go
+      dockerfile: Dockerfile
+    container_name: vanguard-backend
+    ports:
+      - "50051:50051"
+    environment:
+      DATABASE_URL: postgres://vanguard:vanguard_secret@postgres:5432/vanguardhealth?sslmode=disable
+      PORT: 50051
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vanguard-network
+
+  # AI Node Service
+  ai-service:
+    build:
+      context: ./services/ai-node
+      dockerfile: Dockerfile
+    container_name: vanguard-ai
+    ports:
+      - "3001:3001"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      BACKEND_URL: http://backend:50051
+      QDRANT_URL: http://qdrant:6333
+      PORT: 3001
+    depends_on:
+      - backend
+      - qdrant
+    networks:
+      - vanguard-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./services/web-nextjs
+      dockerfile: Dockerfile
+    container_name: vanguard-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:50051
+      NEXT_PUBLIC_AI_URL: http://localhost:3001
+    depends_on:
+      - backend
+      - ai-service
+    networks:
+      - vanguard-network
+
+networks:
+  vanguard-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  qdrant_data:

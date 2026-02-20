@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package health;
+
+option go_package = "github.com/vanguard/shared/proto";
+
+// Health Service - gRPC contract between services
+service HealthService {
+  rpc GetPatient(PatientRequest) returns (PatientResponse);
+  rpc StoreRecord(RecordRequest) returns (RecordResponse);
+  rpc GetRecords(RecordsRequest) returns (RecordsResponse);
+}
+
+// Patient messages
+message PatientRequest {
+  string patient_id = 1;
+}
+
+message PatientResponse {
+  string id = 1;
+  string patient_id = 2;
+  string name = 3;
+  string date_of_birth = 4;
+  string gender = 5;
+}
+
+// Record messages
+message RecordRequest {
+  string patient_id = 1;
+  string record_type = 2;
+  string data = 3; // JSON string
+}
+
+message RecordResponse {
+  string id = 1;
+  string data_hash = 2;
+  string status = 3;
+}
+
+message RecordsRequest {
+  string patient_id = 1;
+  string record_type = 2; // optional filter
+  int32 limit = 3;
+}
+
+message RecordsResponse {
+  repeated HealthRecord records = 1;
+}
+
+message HealthRecord {
+  string id = 1;
+  string patient_id = 2;
+  string record_type = 3;
+  string data = 4;
+  string data_hash = 5;
+  string created_at = 6;
+}

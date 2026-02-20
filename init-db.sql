@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS health_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id VARCHAR(255) NOT NULL,
+    data JSONB NOT NULL,
+    data_hash VARCHAR(64) NOT NULL, -- SHA-256
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
